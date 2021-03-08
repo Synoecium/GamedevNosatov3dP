@@ -17,6 +17,10 @@ void ATestActor::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG(LogTemp, Warning, TEXT("Check test function from c++"));
+	FOutputDeviceNull ar;
+	this->CallFunctionByNameWithArguments(TEXT("test"), ar, this, true);
+	//PZ #3 start
+	UE_LOG(LogTemp, Warning, TEXT("Check setting variable from c++"));
     UFloatProperty* FloatProp = FindField<UFloatProperty>(this->GetClass(), TEXT("Testfloat"));
     if (FloatProp != nullptr)
     {
@@ -24,8 +28,7 @@ void ATestActor::BeginPlay()
         UE_LOG(LogTemp, Warning, TEXT("Testfloat value = %f"), FloatValue);
     }
 
-	FOutputDeviceNull ar;
-	this->CallFunctionByNameWithArguments(TEXT("test"), ar, this, true);
+	FloatProp->SetPropertyValue_InContainer(this, 999.f);
 	UE_LOG(LogTemp, Warning, TEXT("Set the new value..."));
 
     if (FloatProp != nullptr)
@@ -33,7 +36,7 @@ void ATestActor::BeginPlay()
         float FloatValue = FloatProp->GetPropertyValue_InContainer(this);
         UE_LOG(LogTemp, Warning, TEXT("Testfloat value = %f"), FloatValue);
     }
-
+	//PZ #3 finish
 }
 
 // Called every frame
