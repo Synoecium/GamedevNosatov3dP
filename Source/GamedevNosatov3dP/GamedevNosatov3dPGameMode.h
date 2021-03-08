@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "GamedevNosatov3dPGameMode.generated.h"
 
+class UBaseCoreConfig;
+
 UCLASS(minimalapi)
 class AGamedevNosatov3dPGameMode : public AGameModeBase
 {
@@ -17,7 +19,7 @@ public:
 	UPROPERTY(EditAnyWhere, Category = "Bank | Money | USD")
 	int32 AmountOfMoney;
 
-	UPROPERTY(EditAnyWhere)
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 	bool bEnableDance;
 
 	UPROPERTY(EditAnyWhere)
@@ -29,7 +31,22 @@ public:
 	UPROPERTY(EditAnyWhere)
 	TSubclassOf<AActor> Unit;
 
-	void BeginPlay() override;
+	UFUNCTION(BlueprintCallable)
+	bool SpawnUnit(UPARAM(ref) AActor*& parActor);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_UpdateInfo();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Init();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UBaseCoreConfig> ConfigurationClass;
+
+	UPROPERTY()
+	UBaseCoreConfig* Base_ConfRef;
+
+	virtual void BeginPlay() override;
 };
 
 

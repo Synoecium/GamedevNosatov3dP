@@ -1,0 +1,11 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/projectSettingsUpdater.xml
+/.idea.GamedevNosatov3dP.iml
+/contentModel.xml
+# Datasource local storage ignored files
+/../../../../../../../:\Games\UnrealProjects\GamedevNosatov3dP\.idea\.idea.GamedevNosatov3dP\.idea/dataSources/
+/dataSources.local.xml
