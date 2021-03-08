@@ -26,14 +26,11 @@ void ATestActor::BeginPlay()
     {
         float FloatValue = FloatProp->GetPropertyValue_InContainer(this);
         UE_LOG(LogTemp, Warning, TEXT("Testfloat value = %f"), FloatValue);
-    }
 
-	FloatProp->SetPropertyValue_InContainer(this, 999.f);
-	UE_LOG(LogTemp, Warning, TEXT("Set the new value..."));
+		FloatProp->SetPropertyValue_InContainer(this, 999.f);
+		UE_LOG(LogTemp, Warning, TEXT("Set the new value..."));
 
-    if (FloatProp != nullptr)
-    {
-        float FloatValue = FloatProp->GetPropertyValue_InContainer(this);
+        FloatValue = FloatProp->GetPropertyValue_InContainer(this);
         UE_LOG(LogTemp, Warning, TEXT("Testfloat value = %f"), FloatValue);
     }
 	//PZ #3 finish
