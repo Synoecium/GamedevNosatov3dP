@@ -3,7 +3,6 @@
 #include "GamedevNosatov3dPGameMode.h"
 #include "GamedevNosatov3dPCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Core/BaseCoreConfig.h"
 
 AGamedevNosatov3dPGameMode::AGamedevNosatov3dPGameMode()
 {
@@ -53,10 +52,10 @@ void AGamedevNosatov3dPGameMode::BeginPlay()
 
 	if (ConfigurationClass)
 	{
-		Base_ConfRef = NewObject<UBaseCoreConfig>(this,ConfigurationClass);
-		UE_LOG(LogTemp, Warning, TEXT("This is my log value 1: %i"), Base_ConfRef->ConfigValue1);
+		Base_ConfRef = NewObject<UBaseUnitConfig>(this,ConfigurationClass);
+		/*UE_LOG(LogTemp, Warning, TEXT("This is my log value 1: %i"), Base_ConfRef->ConfigValue1);
 		UE_LOG(LogTemp, Warning, TEXT("This is my log value 2: %i"), Base_ConfRef->ConfigValue2);
-		UE_LOG(LogTemp, Warning, TEXT("This is my log value 3: %i"), Base_ConfRef->ConfigValue3);
+		UE_LOG(LogTemp, Warning, TEXT("This is my log value 3: %i"), Base_ConfRef->ConfigValue3);*/
 	}
 	
 	Init();

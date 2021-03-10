@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Core/BaseUnitConfig.h"
 #include "GameFramework/GameModeBase.h"
 #include "GamedevNosatov3dPGameMode.generated.h"
 
@@ -41,10 +43,10 @@ public:
 	void Init();
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UBaseCoreConfig> ConfigurationClass;
+	TSubclassOf<UBaseUnitConfig> ConfigurationClass;
 
 	UPROPERTY()
-	UBaseCoreConfig* Base_ConfRef;
+	UBaseUnitConfig* Base_ConfRef;
 
 	virtual void BeginPlay() override;
 };
