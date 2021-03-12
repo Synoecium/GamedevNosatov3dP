@@ -9,6 +9,8 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 
+#include "Core/Gun.h"
+
 //////////////////////////////////////////////////////////////////////////
 // AGamedevNosatov3dPCharacter
 
@@ -52,9 +54,11 @@ AGamedevNosatov3dPCharacter::AGamedevNosatov3dPCharacter()
 
 void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	/*PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGamedevNosatov3dPCharacter::MoveForward);
@@ -73,68 +77,61 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 	PlayerInputComponent->BindTouch(IE_Released, this, &AGamedevNosatov3dPCharacter::TouchStopped);
 
 	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGamedevNosatov3dPCharacter::OnResetVR);
+	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGamedevNosatov3dPCharacter::OnResetVR);*/
+
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AGamedevNosatov3dPCharacter::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AGamedevNosatov3dPCharacter::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis(TEXT("LookRight"), this, &AGamedevNosatov3dPCharacter::LookRight);
+	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AGamedevNosatov3dPCharacter::LookUpRate);
+	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AGamedevNosatov3dPCharacter::LookRightRate);
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::Jump);
+	PlayerInputComponent->BindAction(TEXT("PullTrigger"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::Shoot);
+
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+	Gun->SetOwner(this);
 }
 
 
-void AGamedevNosatov3dPCharacter::OnResetVR()
+bool AGamedevNosatov3dPCharacter::IsDead() const
 {
-	// If GamedevNosatov3dP is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in GamedevNosatov3dP.Build.cs is not automatically propagated
-	// and a linker error will result.
-	// You will need to either:
-	//		Add "HeadMountedDisplay" to [YourProject].Build.cs PublicDependencyModuleNames in order to build successfully (appropriate if supporting VR).
-	// or:
-	//		Comment or delete the call to ResetOrientationAndPosition below (appropriate if not supporting VR)
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	return false;
 }
 
-void AGamedevNosatov3dPCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void AGamedevNosatov3dPCharacter::MoveForward(float AxisValue)
 {
-		Jump();
+	AddMovementInput(GetActorForwardVector() * AxisValue);
 }
 
-void AGamedevNosatov3dPCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void AGamedevNosatov3dPCharacter::MoveRight(float AxisValue)
 {
-		StopJumping();
+	AddMovementInput(GetActorRightVector() * AxisValue);
 }
 
-void AGamedevNosatov3dPCharacter::TurnAtRate(float Rate)
+void AGamedevNosatov3dPCharacter::LookUpRate(float AxisValue)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGamedevNosatov3dPCharacter::LookUpAtRate(float Rate)
+void AGamedevNosatov3dPCharacter::LookRight(float AxisValue)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	AddControllerYawInput(AxisValue);
 }
 
-void AGamedevNosatov3dPCharacter::MoveForward(float Value)
+void AGamedevNosatov3dPCharacter::LookRightRate(float AxisValue)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
+	AddControllerYawInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGamedevNosatov3dPCharacter::MoveRight(float Value)
+void AGamedevNosatov3dPCharacter::Jump()
 {
-	if ( (Controller != nullptr) && (Value != 0.0f) )
-	{
-		// find out which way is right
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
-		AddMovementInput(Direction, Value);
-	}
+	Super::Jump();
+}
+
+void AGamedevNosatov3dPCharacter::Shoot()
+{
+	if (Gun == nullptr) return;
+	Gun->PullTrigger();
 }

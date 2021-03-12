@@ -48,7 +48,19 @@ public:
 	UPROPERTY()
 	UBaseUnitConfig* Base_ConfRef;
 
+	//PZ #5 start		
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnTurretKilled();
+
+	UFUNCTION(BlueprintPure)
+	float GetScore() const {return Score;};
+	
+protected:
+
+	float Score;
+	//PZ #5 finish
 };
 
 

@@ -41,7 +41,9 @@ void UHealthComponent::TakeDamage(float DamageAmount)
 		AActor* Parent = GetOwner();
 		if (Parent)
 		{
+			
 			Parent->Destroy();
+			Parent->MarkPendingKill();
 		}
 	}
 }
