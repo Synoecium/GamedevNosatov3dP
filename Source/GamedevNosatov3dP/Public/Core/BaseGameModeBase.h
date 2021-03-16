@@ -56,12 +56,34 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetScore() const {return Score;};
-	
-protected:
+	//PZ #5 finish
 
+	//PZ #6 start
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
+
+	UFUNCTION(BlueprintPure)
+	int32 GetAmmoCount() const;
+	
+	UFUNCTION(BlueprintCallable)
+    void SetAmmoCount(int32 NewCount);
+
+	UPROPERTY(EditAnyWhere)
+	int32 AmmoCount = 1;
+	//PZ #6 finish
+protected:
+	//PZ #5 start
 	float Score;
 	//PZ #5 finish
+
+	//PZ #6 start
+	void SaveAmmoToFile(FString FileName);
+	void LoadAmmoFromFile(FString FileName);
+	//PZ #6 finish
 };
+
+
+
 
 
 

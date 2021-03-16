@@ -5,9 +5,11 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Core/BaseGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Core/Gun.h"
 
@@ -130,8 +132,21 @@ void AGamedevNosatov3dPCharacter::Jump()
 	Super::Jump();
 }
 
+//PZ #6 start
 void AGamedevNosatov3dPCharacter::Shoot()
 {
 	if (Gun == nullptr) return;
-	Gun->PullTrigger();
+	UWorld* CurrentWorld = GetWorld();
+	if (CurrentWorld==nullptr) return;
+	ABaseGameModeBase* CurrentGameMode = Cast<ABaseGameModeBase>(UGameplayStatics::GetGameMode(CurrentWorld));
+	if (CurrentGameMode==nullptr) return;
+	
+	int32 CurrentAmmoCount = CurrentGameMode->GetAmmoCount();
+	if (CurrentAmmoCount>0)
+	{
+		Gun->PullTrigger();
+		CurrentAmmoCount--;
+		CurrentGameMode->SetAmmoCount(CurrentAmmoCount);
+	}
 }
+//PZ #6 finish

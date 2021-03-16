@@ -44,7 +44,7 @@ protected:
     void LookUpRate(float AxisValue);
     void LookRight(float AxisValue);
     void LookRightRate(float AxisValue);
-    void Jump();
+    virtual void Jump() override;
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10.f;
