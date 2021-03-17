@@ -80,7 +80,7 @@ void ABaseGameModeBase::BeginPlay()
 //PZ #5 start
 void ABaseGameModeBase::OnTurretKilled()
 {
-	Score+=50.f;
+	Score+=ScoreForKillTurret;
 }
 //PZ #5 finish
 

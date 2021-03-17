@@ -71,6 +71,10 @@ public:
 	UPROPERTY(EditAnyWhere)
 	int32 AmmoCount = 1;
 	//PZ #6 finish
+
+	UPROPERTY(EditAnyWhere)
+	float ScoreForKillTurret = 50.f;
+
 protected:
 	//PZ #5 start
 	float Score;
