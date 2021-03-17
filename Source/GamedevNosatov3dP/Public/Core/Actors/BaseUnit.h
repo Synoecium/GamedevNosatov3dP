@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/InterpToMovementComponent.h"
+#include "Core/Interfaces/DamageInterface.h"
 #include "GameFramework/Actor.h"
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class GAMEDEVNOSATOV3DP_API ABaseUnit : public AActor
+class GAMEDEVNOSATOV3DP_API ABaseUnit : public AActor, public IDamageInterface
 {
 	GENERATED_BODY()
 	
@@ -17,8 +20,16 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* BaseSceletalComp;
+	
+	UPROPERTY(VisibleAnywhere)
+	UInterpToMovementComponent* MoveComponent;
 
-	void Init(float parHealth, float parArmor, float parDamage);
+	UPROPERTY(VisibleAnywhere)
+	float Speed;
+
+	void Init(float parHealth, float parArmor, float parDamage, float parSpeed);
+
+	void SetPath(TArray<FVector> Points);
 	
 protected:
 	// Called when the game starts or when spawned
@@ -31,5 +42,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	//BaseUnit.h
+	virtual void ApplyDamage(FDamageParams DamageParams) override;
 };

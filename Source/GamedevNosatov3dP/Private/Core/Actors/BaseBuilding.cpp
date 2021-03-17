@@ -14,10 +14,12 @@ ABaseBuilding::ABaseBuilding()
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMeshComp"));
 	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	BaseSpawnPont = CreateDefaultSubobject<USceneComponent>(TEXT("BaseSpawnPont"));
+	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));
 	RootComponent = RootComp;
 
 	BaseMesh->SetupAttachment(RootComponent);
 	BaseSpawnPont->SetupAttachment(RootComponent);
+	SplinePath->SetupAttachment(RootComponent);
 	
 }
 
@@ -25,6 +27,7 @@ void ABaseBuilding::SpawnUnit()
 {
 	ABaseUnit* SpawnedUnit = ABaseBuilding::Create_Unit(CurrentUnitConfig);
 	SpawnedUnit->SetActorLocation(BaseSpawnPont->GetComponentLocation());
+	SpawnedUnit->SetPath(PathPoints);
 	OnSpawnUnitChanged.Broadcast(SpawnedUnit);
 }
 
@@ -32,7 +35,7 @@ ABaseUnit* ABaseBuilding::Create_Unit(UBaseUnitConfig* config)
 {
 	UWorld* CurrentWorld = config->GetWorld();
 	ABaseUnit* Unit = Cast<ABaseUnit>(CurrentWorld->SpawnActor(config->UnitClass));
-	Unit->Init(config->Health, config->Armour, config->Damage);
+	Unit->Init(config->Health, config->Armour, config->Damage, config->Speed);
 	return Unit;
 }
 
@@ -42,7 +45,12 @@ void ABaseBuilding::BeginPlay()
 	CurrentUnitConfig = NewObject<UBaseUnitConfig>(this, UnitConfiguration);
 	Super::BeginPlay();
 
-	
+	PathPoints.Empty();
+	const int32 PointsNum = SplinePath->GetNumberOfSplinePoints();
+	for (int32 i=0; i<PointsNum; i++)
+	{
+		PathPoints.Add(SplinePath->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World));
+	}
 }
 
 // Called every frame

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "BaseUnit.h"
+#include "Components/SplineComponent.h"
 #include "GameFramework/Actor.h"
 #include "BaseBuilding.generated.h"
 
@@ -37,6 +38,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* BaseMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USplineComponent* SplinePath;
+	
 	UFUNCTION(BlueprintCallable)
 	void SpawnUnit();
 
@@ -51,6 +55,8 @@ protected:
 	UBaseUnitConfig* CurrentUnitConfig;
 
 	FOnSpawnUnit OnSpawnUnitChanged;
+
+	TArray<FVector> PathPoints;
 
 public:	
 	// Called every frame
