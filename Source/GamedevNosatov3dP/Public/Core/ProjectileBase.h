@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Camera/CameraShake.h"
 #include "GameFramework/Actor.h"
 #include "ProjectileBase.generated.h"
 

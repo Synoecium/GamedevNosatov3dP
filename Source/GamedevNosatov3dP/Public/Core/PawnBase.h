@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Camera/CameraShake.h"
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 

@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Core/Gun.h"
+#include "Core/Actors/BaseUnit.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGamedevNosatov3dPCharacter
@@ -49,6 +50,13 @@ AGamedevNosatov3dPCharacter::AGamedevNosatov3dPCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+}
+
+void AGamedevNosatov3dPCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -130,11 +138,39 @@ void AGamedevNosatov3dPCharacter::LookRightRate(float AxisValue)
 void AGamedevNosatov3dPCharacter::Jump()
 {
 	Super::Jump();
+	
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), FoundActors);
+	for (auto Actor:FoundActors)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Base unit: %s"), *Actor->GetName());
+		auto BaseUnit = Cast<ABaseUnit>(Actor);
+		if (*BaseUnit==1)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Test for int32=="));
+		}
+		if (Actor->IsA<UDamageInterface>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current base unit IsA IDamageInterface"));
+		}
+		if (Actor->Implements<UDamageInterface>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current base unit Implements IDamageInterface"));
+		}
+		if (Actor->IsA(UDamageInterface::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current base unit IsA UDamageInterface"));
+		}
+		if (Actor->GetClass()->IsChildOf(UDamageInterface::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current base unit IsChildOf UDamageInterface"));
+		}
+	}
 }
 
 //PZ #6 start
 void AGamedevNosatov3dPCharacter::Shoot()
-{
+{	
 	if (Gun == nullptr) return;
 	UWorld* CurrentWorld = GetWorld();
 	if (CurrentWorld==nullptr) return;

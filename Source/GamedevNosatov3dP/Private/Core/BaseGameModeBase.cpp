@@ -4,8 +4,19 @@
 #include "GamedevNosatov3dPCharacter.h"
 #include "PawnTurret.h"
 #include "Core/PawnBase.h"
+#include "Core/Actors/BaseBuilding.h"
+#include "Core/Controllers/BasePlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+#include "EngineUtils.h"
+#include "Components/InputComponent.h"
+#include "Engine/World.h"
+#include "Engine/LocalPlayer.h"
+
+#if WITH_EDITOR
+#include "Editor/EditorEngine.h"
+#endif
+
 
 ABaseGameModeBase::ABaseGameModeBase()
 {
@@ -46,6 +57,19 @@ void ABaseGameModeBase::Init_Implementation()
 void ABaseGameModeBase::BeginPlay() 
 {
 	Super::BeginPlay();
+
+	UWorld* CurrentWorld = GetWorld();
+	CurrentWorld->GetFirstPlayerController()->Destroy();
+	for(TActorIterator<AActor>Itr(CurrentWorld);Itr;++Itr)
+	{
+		if (Cast<ABaseBuilding>(*Itr))
+		{
+			ABaseBuilding* CurrentBarracks = Cast<ABaseBuilding>(*Itr);
+			CurrentBarracks->OnSpawnUnit().AddUObject(this, &ABaseGameModeBase::OnUnitCreated);
+		}
+	}
+
+	
 
 	//UE_LOG(LogTemp, Warning, TEXT("I've runned from Actor called: %i"), AmountOfMoney);
 
@@ -97,6 +121,54 @@ void ABaseGameModeBase::Logout(AController* Exiting)
 	Super::Logout(Exiting);
 	UE_LOG(LogTemp, Warning, TEXT("Logout GameMode"));
 	SaveAmmoToFile(TEXT("Ammo.sav"));
+}
+
+void ABaseGameModeBase::OnUnitCreated(ABaseUnit* parUnit)
+{
+	ABasePlayerController* Controller = GetWorld()->SpawnActor<ABasePlayerController>();
+	//Controller->InputComponent = NewObject<UInputComponent>(Controller);
+
+	if (PlayerControllerIndex == 0)
+	{/*
+		FInputChord Ch(EKeys::Up, EInputEvent::IE_Pressed);
+		Controller->SetupInputComponent();
+		Controller->InputComponent->BindKey(Ch, IE_Released, Controller, &ABasePlayerController::OnKeyPressed);*/
+		SavedInputComponent = NewObject<UInputComponent>(Controller);
+		Controller->InputComponent = SavedInputComponent;
+		FInputChord Ch(EKeys::W,EInputEvent::IE_Pressed);
+		parUnit->AutoPossessPlayer = EAutoReceiveInput::Player0;
+		Controller->AutoReceiveInput = EAutoReceiveInput::Player0;
+		Controller->InitInputSystem();
+		Controller->InputComponent->BindKey(Ch,EInputEvent::IE_Released,Controller,&ABasePlayerController::OnKeyPressed);
+	}
+	if (PlayerControllerIndex > 0)
+	{
+		Controller->InputComponent = SavedInputComponent;
+		FInputChord Ch(EKeys::S,EInputEvent::IE_Pressed);
+		parUnit->AutoPossessPlayer = EAutoReceiveInput::Player1;
+		Controller->EnableInput(Controller);
+		Controller->AutoReceiveInput = EAutoReceiveInput::Player1;
+		Controller->InitInputSystem();
+		
+		Controller->InputComponent->BindKey(Ch,EInputEvent::IE_Released,Controller,&ABasePlayerController::OnKeyPressed);	
+	}
+
+	//UEditorEngine* EnginePtr = Cast<UEditorEngine>(GEngine);
+
+	TIndirectArray<FWorldContext> GetWorldContexts = GEngine->GetWorldContexts();
+	UWorld* World = GetWorldContexts.Last().World();
+	FString Error;
+	TArray<ULocalPlayer*> Players = World->GetGameInstance()->GetLocalPlayers();
+
+	if(PlayerControllerIndex == 0)
+		World->GetGameInstance()->RemoveLocalPlayer(Players.Last());
+	
+	ULocalPlayer* LocalPlayer = World ? World->GetGameInstance()->CreateLocalPlayer(PlayerControllerIndex, Error, false) : nullptr;
+	LocalPlayer->SwitchController(Controller);
+	Controller->InputComponent->ConditionalBuildKeyMap(Controller->PlayerInput);
+	Controller->Possess(parUnit);
+	
+	PlayerControllerIndex++;
 }
 
 void ABaseGameModeBase::SaveAmmoToFile(FString FileName)

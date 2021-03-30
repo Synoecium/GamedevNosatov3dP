@@ -3,6 +3,8 @@
 
 #include "TestSceneActor.h"
 
+#include "UObject/ConstructorHelpers.h"
+
 // Sets default values
 ATestSceneActor::ATestSceneActor()
 {

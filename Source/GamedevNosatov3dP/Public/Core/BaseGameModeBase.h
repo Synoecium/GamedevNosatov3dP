@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+
+#include "Actors/BaseUnit.h"
 #include "Core/Configs/BaseUnitConfig.h"
 #include "GameFramework/GameModeBase.h"
 #include "BaseGameModeBase.generated.h"
@@ -75,6 +77,11 @@ public:
 	UPROPERTY(EditAnyWhere)
 	float ScoreForKillTurret = 50.f;
 
+	int32 PlayerControllerIndex = 0;
+	
+	UFUNCTION()
+	void OnUnitCreated(ABaseUnit* parUnit);
+
 protected:
 	//PZ #5 start
 	float Score;
@@ -84,6 +91,9 @@ protected:
 	void SaveAmmoToFile(FString FileName);
 	void LoadAmmoFromFile(FString FileName);
 	//PZ #6 finish
+
+	UPROPERTY(EditAnyWhere)
+	UInputComponent* SavedInputComponent;
 };
 
 

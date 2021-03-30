@@ -10,7 +10,7 @@
 #include "BaseUnit.generated.h"
 
 UCLASS()
-class GAMEDEVNOSATOV3DP_API ABaseUnit : public AActor, public IDamageInterface
+class GAMEDEVNOSATOV3DP_API ABaseUnit : public APawn, public IDamageInterface
 {
 	GENERATED_BODY()
 	
@@ -30,6 +30,11 @@ public:
 	void Init(float parHealth, float parArmor, float parDamage, float parSpeed);
 
 	void SetPath(TArray<FVector> Points);
+
+public:
+	bool operator==(int32 Other) {return true;};
+	//virtual bool operator==(int32 Other) = delete;
+	//bool operator==(int32 Other) = delete;
 	
 protected:
 	// Called when the game starts or when spawned

@@ -29,6 +29,10 @@ void ABaseBuilding::SpawnUnit()
 	SpawnedUnit->SetActorLocation(BaseSpawnPont->GetComponentLocation());
 	SpawnedUnit->SetPath(PathPoints);
 	OnSpawnUnitChanged.Broadcast(SpawnedUnit);
+
+	ABaseUnit* SpawnedUnit2 = ABaseBuilding::Create_Unit(CurrentUnitConfig);
+	SpawnedUnit2->SetActorLocation(BaseSpawnPont->GetComponentLocation());
+	OnSpawnUnitChanged.Broadcast(SpawnedUnit2);
 }
 
 ABaseUnit* ABaseBuilding::Create_Unit(UBaseUnitConfig* config)
