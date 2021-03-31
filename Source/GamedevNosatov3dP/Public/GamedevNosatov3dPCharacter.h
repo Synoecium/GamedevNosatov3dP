@@ -3,14 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+
+#include "Core/Controllers/BasePlayerController.h"
+#include "Core/Interfaces/Saveable.h"
 #include "GameFramework/Character.h"
 #include "GamedevNosatov3dPCharacter.generated.h"
 
 class AGun;
 
+USTRUCT()
+struct FS
+{
+	GENERATED_BODY()
+
+	UPROPERTY(SaveGame)
+	int32 TestVar;	
+};
 
 UCLASS(config=Game)
-class AGamedevNosatov3dPCharacter : public ACharacter
+class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -51,6 +63,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10.f;
 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// float WeaponRange = 5000.f;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGun> GunClass;
 	
@@ -67,5 +82,25 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+public:
+
+	virtual void Saved() override;
+	virtual void Loaded() override;
+	virtual void PreSaved() override {};
+	virtual void PreLoaded() override {};
+
+	UFUNCTION(BlueprintCallable)
+	void Save(ABasePlayerController* Player);
+
+	UFUNCTION(BlueprintCallable)
+	void Load(ABasePlayerController* Player);
+
+private:
+	UPROPERTY(SaveGame)
+	int32 TestVar = 0;
+
+	UPROPERTY(SaveGame)
+	FS TestStruct;
 };
 

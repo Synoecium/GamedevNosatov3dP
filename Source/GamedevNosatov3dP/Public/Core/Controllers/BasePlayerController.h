@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Core/Interfaces/Saveable.h"
 #include "GameFramework/PlayerController.h"
 #include "BasePlayerController.generated.h"
 
@@ -10,7 +12,7 @@
  * 
  */
 UCLASS()
-class GAMEDEVNOSATOV3DP_API ABasePlayerController : public APlayerController
+class GAMEDEVNOSATOV3DP_API ABasePlayerController : public APlayerController, public ISaveable
 {
 	GENERATED_BODY()
 

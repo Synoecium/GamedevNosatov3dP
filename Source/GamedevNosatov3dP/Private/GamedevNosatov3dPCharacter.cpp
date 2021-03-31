@@ -2,6 +2,7 @@
 
 #include "GamedevNosatov3dPCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "MyGameInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -56,7 +57,7 @@ void AGamedevNosatov3dPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -102,6 +103,41 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 	Gun->SetOwner(this);
+	//Gun->MaxRange = WeaponRange;
+}
+
+void AGamedevNosatov3dPCharacter::Saved()
+{
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER SAVED"));
+}
+
+void AGamedevNosatov3dPCharacter::Loaded()
+{
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER LOADED"));
+}
+
+void AGamedevNosatov3dPCharacter::Save(ABasePlayerController* Player)
+{
+	UE_LOG(LogTemp, Warning, TEXT("TestVar = %d"), TestVar);
+	TestVar++;
+	if (GetWorld())
+	{
+		if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GI->Save(Player);
+		}
+	}
+}
+
+void AGamedevNosatov3dPCharacter::Load(ABasePlayerController* Player)
+{
+	if (GetWorld())
+	{
+		if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GI->Load(Player);
+		}
+	}
 }
 
 

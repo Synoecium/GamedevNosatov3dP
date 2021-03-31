@@ -27,6 +27,9 @@ class GAMEDEVNOSATOV3DP_API AGun : public AActor
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	float MaxRange = 1000.f;
+	
 	private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -46,8 +49,7 @@ class GAMEDEVNOSATOV3DP_API AGun : public AActor
 	UPROPERTY(EditAnywhere)
 	USoundBase* ImpactSound;
 
-	UPROPERTY(EditAnywhere)
-	float MaxRange = 1000.f;
+
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 10.f;

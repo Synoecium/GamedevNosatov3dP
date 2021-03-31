@@ -21,11 +21,11 @@
 ABaseGameModeBase::ABaseGameModeBase()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPersonCharacter"));
+	/*static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != nullptr)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+	}*/
 
 	AmountOfMoney = 100;
 	bEnableDance = false;
@@ -59,13 +59,13 @@ void ABaseGameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	UWorld* CurrentWorld = GetWorld();
-	CurrentWorld->GetFirstPlayerController()->Destroy();
+	//CurrentWorld->GetFirstPlayerController()->Destroy();
 	for(TActorIterator<AActor>Itr(CurrentWorld);Itr;++Itr)
 	{
 		if (Cast<ABaseBuilding>(*Itr))
 		{
 			ABaseBuilding* CurrentBarracks = Cast<ABaseBuilding>(*Itr);
-			CurrentBarracks->OnSpawnUnit().AddUObject(this, &ABaseGameModeBase::OnUnitCreated);
+			//CurrentBarracks->OnSpawnUnit().AddUObject(this, &ABaseGameModeBase::OnUnitCreated);
 		}
 	}
 
