@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 
+
+#include "Components/WidgetComponent.h"
 #include "Core/Controllers/BasePlayerController.h"
 #include "Core/Interfaces/Saveable.h"
 #include "GameFramework/Character.h"
@@ -33,6 +35,12 @@ class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* ButtonComponent;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> ButtonClass;
+
 public:
 	AGamedevNosatov3dPCharacter();
 

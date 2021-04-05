@@ -10,6 +10,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
+#include "Core/UI/MyHUD.h"
 #include "Engine/World.h"
 #include "Engine/LocalPlayer.h"
 
@@ -97,6 +98,19 @@ void ABaseGameModeBase::BeginPlay()
 		}
 	}
 	//PZ #5 finish
+
+	/*if (MainMenuClass)
+	{
+		UMainMenuWidget* Widget = CreateWidget<UMainMenuWidget>(GetWorld(),MainMenuClass);
+		Widget->AddToViewport();
+	}*/
+
+	/*AMyHUD* HUD = Cast<AMyHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD());
+	if (HUD)
+	{
+		HUD->AddWidget(EWidgetId::MainMenu);
+	}*/
+	
 	
 	Init();
 }

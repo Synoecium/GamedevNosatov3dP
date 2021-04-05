@@ -8,6 +8,8 @@
 #include "Actors/BaseUnit.h"
 #include "Core/Configs/BaseUnitConfig.h"
 #include "GameFramework/GameModeBase.h"
+#include "UI/MainMenuWidget.h"
+
 #include "BaseGameModeBase.generated.h"
 
 class UBaseCoreConfig;
@@ -81,6 +83,9 @@ public:
 	
 	UFUNCTION()
 	void OnUnitCreated(ABaseUnit* parUnit);
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UMainMenuWidget> MainMenuClass;
 
 protected:
 	//PZ #5 start

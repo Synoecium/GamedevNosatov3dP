@@ -51,13 +51,29 @@ AGamedevNosatov3dPCharacter::AGamedevNosatov3dPCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	ButtonComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("ButtonComponent"));
+	ButtonComponent->SetWidgetSpace(EWidgetSpace::World);
+	ButtonComponent->SetupAttachment(RootComponent);
+	if (ButtonClass)
+	{
+		UUserWidget* Button = CreateWidget<UUserWidget>(GetWorld(),ButtonClass);
+		ButtonComponent->SetWidget(Button);
+		
+	}
+	//else GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Button class is empty!"));
+	
+	//ButtonComponent->SetRelativeLocationAndRotation(FVector(0,0,0),FRotator(0,180,0));
+	
 }
 
 void AGamedevNosatov3dPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	//ButtonComponent->SetRelativeLocation(FVector(0,0,0));
+	//ButtonComponent->SetWorldLocation(FVector(0,0,0));
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -104,6 +120,14 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 	Gun->SetOwner(this);
 	//Gun->MaxRange = WeaponRange;
+
+	if (ButtonClass)
+	{
+		UUserWidget* Button = CreateWidget<UUserWidget>(GetWorld(),ButtonClass);
+		ButtonComponent->SetWidget(Button);
+		
+	}
+	//ButtonComponent->SetRelativeLocationAndRotation(FVector(0,0,0),FRotator(0,180,0));
 }
 
 void AGamedevNosatov3dPCharacter::Saved()
