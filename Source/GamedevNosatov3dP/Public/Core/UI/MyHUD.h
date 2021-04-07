@@ -25,6 +25,8 @@ class GAMEDEVNOSATOV3DP_API AMyHUD : public AHUD
 public:
 	UUserWidget* AddWidget(EWidgetId WidgetId);
 
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditDefaultsOnly)
 	TMap<EWidgetId, TSubclassOf<UUserWidget>> WidgetClasses;
 	
