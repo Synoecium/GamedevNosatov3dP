@@ -9,7 +9,7 @@ void UMyGameInstance::Init()
 
 	SaveLoadInstance = NewObject<USaveLoadObject>();
 	
-	
+	_DLCLoader = NewObject<UDLCLoader>(this, "DLC_Loader");
 }
 
 void UMyGameInstance::Save(APlayerController* Player)
@@ -26,4 +26,9 @@ void UMyGameInstance::Load(APlayerController* Player)
 	{
 		SaveLoadInstance->LoadCharacter(Player);
 	}
+}
+
+TArray<FMapInfo> UMyGameInstance::GetMapInfo()
+{
+	return _DLCLoader->GetMapsInfo();
 }

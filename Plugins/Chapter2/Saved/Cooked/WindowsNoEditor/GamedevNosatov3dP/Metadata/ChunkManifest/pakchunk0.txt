@@ -1,0 +1,3 @@
+C:\Games\UnrealProjects\GamedevNosatov3dP\Plugins\Chapter2\Saved\Cooked\WindowsNoEditor\GamedevNosatov3dP\Plugins\Chapter2\Content\BP_Chapter2Map1InfoAsset
+C:\Games\UnrealProjects\GamedevNosatov3dP\Plugins\Chapter2\Saved\Cooked\WindowsNoEditor\GamedevNosatov3dP\Plugins\Chapter2\Content\Chapter2Map1
+C:\Games\UnrealProjects\GamedevNosatov3dP\Plugins\Chapter2\Saved\Cooked\WindowsNoEditor\GamedevNosatov3dP\Plugins\Chapter2\Content\Chapter2Map1_BuiltData

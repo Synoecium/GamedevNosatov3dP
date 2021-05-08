@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 
+#include "DLCLoader.h"
 #include "GamedevNosatov3dPCharacter.h"
 #include "SaveLoadObject.h"
 #include "Engine/GameInstance.h"
@@ -24,8 +25,15 @@ public:
 	void Save(APlayerController* Player);
 	void Load(APlayerController* Player);
 
+	UFUNCTION(BlueprintCallable)
+	TArray<FMapInfo> GetMapInfo();
+
 private:
 	UPROPERTY()
 	USaveLoadObject* SaveLoadInstance;
+
+protected:
+	UPROPERTY()
+	UDLCLoader* _DLCLoader;
 	
 };

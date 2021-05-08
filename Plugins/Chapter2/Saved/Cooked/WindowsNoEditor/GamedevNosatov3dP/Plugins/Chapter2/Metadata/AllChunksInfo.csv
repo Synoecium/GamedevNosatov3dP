@@ -1,0 +1,4 @@
+ChunkID, Package Name, Class Type, Hard or Soft Chunk, File Size, Other Chunks
+0,/Chapter2/BP_Chapter2Map1InfoAsset,Blueprint,Soft: Possibly Unassigned Asset,1692,None
+0,/Chapter2/Chapter2Map1,World,Soft: Possibly Unassigned Asset,14292,None
+0,/Chapter2/Chapter2Map1_BuiltData,MapBuildDataRegistry,Soft: Possibly Unassigned Asset,189434,None
