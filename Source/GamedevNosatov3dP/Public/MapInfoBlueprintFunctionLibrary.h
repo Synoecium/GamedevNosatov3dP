@@ -35,6 +35,12 @@ struct FMapInfo
 	
 };
 
+UENUM()
+enum EPingPongStatus
+{
+	Start = 0, Stop
+};
+
 UCLASS()
 class GAMEDEVNOSATOV3DP_API UMapInfoBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -43,6 +49,17 @@ class GAMEDEVNOSATOV3DP_API UMapInfoBlueprintFunctionLibrary : public UBlueprint
 	/*Blueprint function to return the value from the struct*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MapInfo|Methods")
 	static FString GetLevelReference(UPARAM(ref) FMapInfo& MyStructRef) { return MyStructRef.GetLevelReference(); };
+
+	/*
+	 * @param InActor - Actor to ping pong
+	 * @param LocationA - Start location
+	 * @param LocationB - End Location
+	 * @param Status - Status
+	 * @param Info Info about the Action in background
+	 */
+	UFUNCTION(BlueprintCallable, meta = (Latent, LatentInfo = "LatentInfo", WorldContext = "WorldContextObject", ExpandEnumAsExecs = "Status"),
+		Category = "MasterBFL")
+	static void PingPong(AActor* InActor, FVector LocationA, FVector LocationB, TEnumAsByte<EPingPongStatus> Status, FLatentActionInfo LatentInfo);
 };
 
 UCLASS(BlueprintType, Blueprintable)
