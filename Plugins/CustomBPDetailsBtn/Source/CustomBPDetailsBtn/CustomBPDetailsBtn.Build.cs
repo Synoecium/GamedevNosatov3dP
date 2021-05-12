@@ -26,6 +26,7 @@ public class CustomBPDetailsBtn : ModuleRules
 			new string[]
 			{
 				"Core",
+				"MediaAssets"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

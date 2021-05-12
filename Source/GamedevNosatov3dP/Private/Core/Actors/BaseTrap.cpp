@@ -35,7 +35,7 @@ void ABaseTrap::BeginPlay()
 void ABaseTrap::OnTriggerOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Trap %s activated!"), *GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("Trap %s activated!"), *GetName());
 	bool IsDamageable = OtherActor->Implements<UDamageInterface>();
 	IDamageInterface* Interface = Cast<IDamageInterface>(OtherActor);
 	if (Interface)

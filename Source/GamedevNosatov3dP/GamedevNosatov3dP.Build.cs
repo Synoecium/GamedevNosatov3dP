@@ -8,7 +8,7 @@ public class GamedevNosatov3dP : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "CustomBPDetailsBtn" });
 		
 		PrivateDependencyModuleNames.AddRange(new string[]{"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile"});
 

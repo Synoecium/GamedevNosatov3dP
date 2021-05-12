@@ -19,10 +19,11 @@ void UMapInfoBlueprintFunctionLibrary::PingPong(AActor* InActor, FVector Locatio
 				PingPongAction = new FPingPongAction(InActor, LocationA, LocationB, LatentInfo);
 				LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, PingPongAction);	
 			}
-			else if (Status == EPingPongStatus::Stop)
-			{
-				PingPongAction->bComplete = true;
-			}
+		}
+		else if (Status == EPingPongStatus::Stop)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Stop PingPong!"));
+			PingPongAction->bComplete = true;
 		}
 	}
 }

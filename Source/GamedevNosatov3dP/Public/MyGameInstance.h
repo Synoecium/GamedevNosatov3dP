@@ -9,6 +9,8 @@
 #include "GamedevNosatov3dPCharacter.h"
 #include "SaveLoadObject.h"
 #include "Engine/GameInstance.h"
+#include "VideoPlayer/VideoPlayerManager.h"
+
 #include "MyGameInstance.generated.h"
 
 /**
@@ -28,9 +30,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FMapInfo> GetMapInfo();
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UVideoConfig> VideoConfig;
+
 private:
 	UPROPERTY()
 	USaveLoadObject* SaveLoadInstance;
+
+	UPROPERTY()
+	UVideoPlayerManager* VideoPlayerManager;
 
 protected:
 	UPROPERTY()

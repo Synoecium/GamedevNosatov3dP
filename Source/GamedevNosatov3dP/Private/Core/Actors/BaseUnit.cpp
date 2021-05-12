@@ -70,7 +70,7 @@ void ABaseUnit::Tick(float DeltaTime)
 
 void ABaseUnit::ApplyDamage(FDamageParams DamageParams)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s take damage %f from %s"), *GetName(), DamageParams.DamageValue, *DamageParams.DamageMaker->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s take damage %f from %s"), *GetName(), DamageParams.DamageValue, *DamageParams.DamageMaker->GetName());
 }
 
 

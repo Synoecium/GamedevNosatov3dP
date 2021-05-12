@@ -10,6 +10,15 @@ void UMyGameInstance::Init()
 	SaveLoadInstance = NewObject<USaveLoadObject>();
 	
 	_DLCLoader = NewObject<UDLCLoader>(this, "DLC_Loader");
+
+	VideoPlayerManager = NewObject<UVideoPlayerManager>(this);
+	//VideoPlayerManager->Init();
+	if (VideoConfig)
+	{
+		VideoPlayerManager->Init(VideoConfig);
+		VideoPlayerManager->LoadTestVideoResources();
+		VideoPlayerManager->PlayTestVideo();
+	}
 }
 
 void UMyGameInstance::Save(APlayerController* Player)
