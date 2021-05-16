@@ -2,7 +2,10 @@
 
 
 #include "Core/ProjectileBase.h"
+
+#include "Chaos/GeometryParticlesfwd.h"
 #include "Components/StaticMeshComponent.h"
+#include "Core/Controllers/BasePlayerController.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -56,10 +59,33 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 		GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(HitShake);
+
+		if (OtherActor->ActorHasTag(FName("ComboCount")))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("%s actor hit"), *OtherActor->GetName());
+			_bUsefulAimHit = true;
+		}		
+		
 		Destroy();
 	}
+}
 
-	
+void AProjectileBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	auto playerController = Cast<ABasePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
+	if (playerController)
+	{
+		if (_bUsefulAimHit)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Player hit the aim!"));
+			//playerController->OnPlayerHitAim.Broadcast();
+			playerController->RegisterHitAim();
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Player missed!"));
+			playerController->OnPlayerMissAim.Broadcast();
+		}
+	};
 
-	
 }

@@ -20,6 +20,8 @@ void ABasePlayerController::BeginPlay()
 		}
 	}
 	*/
+
+	OnPlayerMissAim.AddUObject(this, &ABasePlayerController::ClearHitCounts);
 }
 
 void ABasePlayerController::SetupInputComponent()
@@ -39,6 +41,18 @@ void ABasePlayerController::OnKeyPressed()
 {
 	UE_LOG(LogTemp, Warning, TEXT("We pressed W key"));
 }
+
+void ABasePlayerController::ClearHitCounts()
+{
+	HitCountInRow = 0;
+}
+
+void ABasePlayerController::RegisterHitAim()
+{
+	HitCountInRow++;
+	OnPlayerHitAim.Broadcast(HitCountInRow);
+}
+
 /*
 void ABasePlayerController::OnUnitCreated(ABaseUnit* Unit)
 {

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "HitComboWidget.h"
 #include "GameFramework/HUD.h"
 #include "MyHUD.generated.h"
 
@@ -27,8 +29,25 @@ public:
 
 	virtual void BeginPlay() override;
 
+	//Primary draw call for the HUD.
+	virtual void DrawHUD() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void UpdateComboCount(int32 Value);
+
+	UFUNCTION()
+	void ResetCombo();
+	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<EWidgetId, TSubclassOf<UUserWidget>> WidgetClasses;
+
+	UPROPERTY(EditDefaultsOnly, Category="Interactive")
+	TSubclassOf<UUserWidget> HitComboWidgetClass;
+
+private:
+	UHitComboWidget* HitComboWidget;
 	
 	
 };

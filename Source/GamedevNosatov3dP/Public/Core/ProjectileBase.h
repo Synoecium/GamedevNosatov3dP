@@ -46,12 +46,17 @@ private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalInputs, const FHitResult& Hit);
 
+	//virtual void BeginDestroy() override { UE_LOG(LogTemp, Warning, TEXT("Projectile destroyed!")); };
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 public:	
 	// Sets default values for this actor's properties
 	AProjectileBase();
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	bool _bUsefulAimHit = false;
 
 };

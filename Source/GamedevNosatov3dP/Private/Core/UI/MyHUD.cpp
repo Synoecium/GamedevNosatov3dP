@@ -4,8 +4,10 @@
 #include "Core/UI/MyHUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Core/Controllers/BasePlayerController.h"
 #include "Core/UI/SHSVColorPickerWidget.h"
 #include "Core/UI/SSpectrumSVWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 UUserWidget* AMyHUD::AddWidget(EWidgetId WidgetId)
 {
@@ -22,10 +24,56 @@ UUserWidget* AMyHUD::AddWidget(EWidgetId WidgetId)
 void AMyHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
+/*	//Slate color picker
 	GEngine->GameViewport->AddViewportWidgetContent(
 		SNew(SHSVColorPickerWidget)
 		//.SelectedColor(FLinearColor(120.f, 0.8f, 0.9f))
 	);
-	
+*/
+
+	if (HitComboWidgetClass)
+	{
+		HitComboWidget = CreateWidget<UHitComboWidget>(GetWorld(), HitComboWidgetClass);
+		/** Make sure widget class created */
+		if (HitComboWidget)
+		{
+			/** Add it to the viewport */
+			HitComboWidget->AddToViewport();
+		}
+	}
+
+	auto playerController = Cast<ABasePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
+	playerController->OnPlayerHitAim.AddUObject(this, &AMyHUD::UpdateComboCount);
+	playerController->OnPlayerMissAim.AddUObject(this, &AMyHUD::ResetCombo);
+}
+
+void AMyHUD::DrawHUD()
+{
+	Super::DrawHUD();
+}
+
+void AMyHUD::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (HitComboWidget)
+	{
+		
+	}
+}
+
+void AMyHUD::UpdateComboCount(int32 Value)
+{
+	if (HitComboWidget)
+	{
+		HitComboWidget->UpdateComboCount(Value);
+	}
+}
+
+void AMyHUD::ResetCombo()
+{
+	if (HitComboWidget)
+	{
+		HitComboWidget->ResetCombo();
+	}
 }

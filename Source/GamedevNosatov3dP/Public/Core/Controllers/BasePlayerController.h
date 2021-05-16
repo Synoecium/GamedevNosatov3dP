@@ -11,6 +11,11 @@
 /**
  * 
  */
+
+DECLARE_EVENT_OneParam(ABasePlayerController, FOnPlayerHitAim, int32);
+DECLARE_MULTICAST_DELEGATE(FOnPlayerMissAim);
+
+
 UCLASS()
 class GAMEDEVNOSATOV3DP_API ABasePlayerController : public APlayerController, public ISaveable
 {
@@ -29,5 +34,16 @@ public:
 
 	//UFUNCTION()
 	//void OnUnitCreated(class ABaseUnit* Unit);
+
+	FOnPlayerHitAim OnPlayerHitAim;
+	FOnPlayerMissAim OnPlayerMissAim;
+
+	UFUNCTION()
+	void ClearHitCounts();
+
+	void RegisterHitAim();
+
+private:
+	int32 HitCountInRow = 0;
 	
 };
