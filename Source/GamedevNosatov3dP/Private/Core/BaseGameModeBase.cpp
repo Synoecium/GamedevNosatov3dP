@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Core/BaseGameModeBase.h"
+
+#include "DesktopPlatformModule.h"
 #include "GamedevNosatov3dPCharacter.h"
 #include "PawnTurret.h"
 #include "Core/PawnBase.h"
@@ -9,10 +11,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EngineUtils.h"
+#include "IDesktopPlatform.h"
+#include "ImageUtils.h"
 #include "Components/InputComponent.h"
 #include "Core/UI/MyHUD.h"
 #include "Engine/World.h"
 #include "Engine/LocalPlayer.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 #if WITH_EDITOR
 #include "Editor/EditorEngine.h"
@@ -183,6 +188,49 @@ void ABaseGameModeBase::OnUnitCreated(ABaseUnit* parUnit)
 	Controller->Possess(parUnit);
 	
 	PlayerControllerIndex++;
+}
+
+void ABaseGameModeBase::OpenFileDialog(const FString& DialogTitle, const FString& DefaultPath, const FString& FileTypes,
+	TArray<FString>& OutFileNames)
+{
+	if (GEngine && GEngine->GameViewport)
+	{
+		void* ParentWindowHandle = GEngine->GameViewport->GetWindow()->GetNativeWindow()->GetOSWindowHandle();
+		IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+		if (DesktopPlatform)
+		{
+			// open file picker
+			uint32 SelectionFlag = 0; // if one or few files are chosen
+			DesktopPlatform->OpenFileDialog(ParentWindowHandle, DialogTitle, DefaultPath, FString(""), FileTypes, SelectionFlag, OutFileNames);
+		}
+	}
+}
+
+void ABaseGameModeBase::SetImageFileAsTexture(AActor* TargetActor, const FString& Filename)
+{
+	if (!TargetActor) return;
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *Filename);
+	auto loadedTexture = FImageUtils::ImportFileAsTexture2D(Filename);
+	auto meshComp = Cast<UPrimitiveComponent>(TargetActor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	if (!meshComp) return;
+	auto matInstance = LoadObject<UMaterialInterface>(this, TEXT("/Game/Materials/M_BasePicture.M_BasePicture"));
+	if (matInstance)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Set instanced material"));
+		meshComp->SetMaterial(0, matInstance);
+	}
+	UMaterialInterface* MaterialInstance = meshComp->GetMaterial(0);
+	UMaterialInstanceDynamic* MID = Cast<UMaterialInstanceDynamic>(MaterialInstance);
+
+	if (MaterialInstance && !MID)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Set texture to material"));
+		// Create and set the dynamic material instance.
+		MID = UMaterialInstanceDynamic::Create(MaterialInstance, this, NAME_None);
+		MID->SetTextureParameterValue(TEXT("Texture_Param"),loadedTexture);
+		meshComp->SetMaterial(0, MID);
+		
+	}
 }
 
 void ABaseGameModeBase::SaveAmmoToFile(FString FileName)

@@ -87,6 +87,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UMainMenuWidget> MainMenuClass;
 
+	UFUNCTION(BlueprintCallable)
+	void OpenFileDialog(const FString& DialogTitle, const FString& DefaultPath, const FString& FileTypes, TArray<FString>& OutFileNames);
+	
+	UFUNCTION(BlueprintCallable)
+	void SetImageFileAsTexture(AActor* TargetActor, const FString& Filename);
+
 protected:
 	//PZ #5 start
 	float Score;

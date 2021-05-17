@@ -11,7 +11,7 @@ public class GamedevNosatov3dP : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "CustomBPDetailsBtn",
 		    "AIModule", "GameplayTasks", "ProceduralMeshComponent"});
 		
-		PrivateDependencyModuleNames.AddRange(new string[]{"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile"});
+		PrivateDependencyModuleNames.AddRange(new string[]{"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile", "DesktopPlatform"});
 
 		if (Target.Type == TargetRules.TargetType.Editor)
 		{
