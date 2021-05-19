@@ -3,6 +3,7 @@
 #include "GamedevNosatov3dPCharacter.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "MyGameInstance.h"
+#include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -114,6 +115,10 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AGamedevNosatov3dPCharacter::LookRightRate);
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("PullTrigger"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::Shoot);
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	PlayerInputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::StartCrouch);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Released, this, &AGamedevNosatov3dPCharacter::StopCrouch);
+	PlayerInputComponent->BindAction(TEXT("AnimationTest"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::AnimationTest);
 
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
@@ -198,7 +203,8 @@ void AGamedevNosatov3dPCharacter::LookRightRate(float AxisValue)
 void AGamedevNosatov3dPCharacter::Jump()
 {
 	Super::Jump();
-	
+
+	/*
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), FoundActors);
 	for (auto Actor:FoundActors)
@@ -226,6 +232,31 @@ void AGamedevNosatov3dPCharacter::Jump()
 			UE_LOG(LogTemp, Warning, TEXT("Current base unit IsChildOf UDamageInterface"));
 		}
 	}
+	*/
+}
+
+void AGamedevNosatov3dPCharacter::StartCrouch()
+{
+	Super::Crouch(false);
+}
+
+void AGamedevNosatov3dPCharacter::StopCrouch()
+{
+	Super::UnCrouch(false);
+}
+
+bool AGamedevNosatov3dPCharacter::CanCrouch() const
+{
+	return Super::CanCrouch() && !GetMovementComponent()->IsFalling();
+}
+
+void AGamedevNosatov3dPCharacter::AnimationTest()
+{
+	if (TestMontageRef)
+	{
+		PlayAnimMontage(TestMontageRef, 1.f, TestMontageSectionName);
+	}
+	
 }
 
 //PZ #6 start
@@ -245,4 +276,28 @@ void AGamedevNosatov3dPCharacter::Shoot()
 		CurrentGameMode->SetAmmoCount(CurrentAmmoCount);
 	}
 }
+
+float AGamedevNosatov3dPCharacter::PlayAnimMontage(UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName)
+{
+	auto MeshComp = Cast<USkeletalMeshComponent>(FindComponentByClass(USkeletalMeshComponent::StaticClass()));
+	UAnimInstance* AnimInstance = (MeshComp) ? MeshComp->GetAnimInstance() : nullptr;
+
+	if (AnimMontage && AnimInstance)
+	{
+		float const Duration = AnimInstance->Montage_Play(AnimMontage, InPlayRate);
+
+		if (Duration > 0.f)
+		{
+			//Start at a given Section.
+			if (StartSectionName != NAME_None)
+			{
+				AnimInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
+			}
+			return Duration;
+		}
+	}
+	return 0.f;
+	
+}
+
 //PZ #6 finish

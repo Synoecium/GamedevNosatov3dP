@@ -59,7 +59,7 @@ void AMaterialActor::Tick(float DeltaTime)
 	
 	auto color =  ColorCurve->GetVectorValue(_startTimeColor + (_elapsedTime / AnimationTime) * (_endTimeColor - _startTimeColor));
 	auto met =  MetallicCurve->GetFloatValue(_startTimeMet + (_elapsedTime / AnimationTime) * (_endTimeMet - _startTimeMet));
-	if (_DynamicMatInstance)
+	if (_DynamicMatInstance->IsValidLowLevel())
 	{
 		_DynamicMatInstance->SetVectorParameterValue(FName("Color_Param"), color);
 		_DynamicMatInstance->SetScalarParameterValue(FName("Met_Param"), met);

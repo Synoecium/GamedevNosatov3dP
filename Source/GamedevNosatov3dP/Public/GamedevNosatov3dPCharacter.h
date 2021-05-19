@@ -53,11 +53,22 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, Category="Test")
+	FName TestMontageSectionName;
+
+	UPROPERTY(EditDefaultsOnly, Category="Test")
+	UAnimMontage* TestMontageRef;
 	
 	UFUNCTION(BlueprintPure)
     bool IsDead() const;
 
 	void Shoot();
+
+	float PlayAnimMontage(UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName) override;
+	
+	bool IsAnimationBlended() {return true;};
+	bool IsArmed() {return true;};
 
 protected:
 
@@ -67,6 +78,10 @@ protected:
     void LookRight(float AxisValue);
     void LookRightRate(float AxisValue);
     virtual void Jump() override;
+	void StartCrouch();
+	void StopCrouch();
+	virtual bool CanCrouch() const override;
+	void AnimationTest();
 
 	UPROPERTY(EditAnywhere)
 	float RotationRate = 10.f;
