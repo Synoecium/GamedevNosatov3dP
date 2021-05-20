@@ -44,7 +44,7 @@ void ABaseUnit::SetPath(TArray<FVector> Points)
 	float currDuration = totalDistance/Speed;
 	MoveComponent->Duration = currDuration;
 
-	UE_LOG(LogTemp, Warning, TEXT("Set path for %s. Distance: %f, Speed: %f, Duration: %f"), *GetName(), totalDistance, Speed, currDuration);
+	//UE_LOG(LogTemp, Warning, TEXT("Set path for %s. Distance: %f, Speed: %f, Duration: %f"), *GetName(), totalDistance, Speed, currDuration);
 	/*for (FVector point : Points)
 	{
 		MoveComponent->AddControlPointPosition(point, false);

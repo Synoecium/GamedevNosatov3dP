@@ -36,7 +36,7 @@ void ABaseSpawnIndicator::BeginPlay()
 			// CurrentBarracks->OnSpawnUnit().Add(GravComp->OnActivateGravity);
 			CurrentBarracks->OnSpawnUnit().AddLambda([](ABaseUnit* u)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("I've added dynamically function to unit %s"), *u->GetName());
+				//UE_LOG(LogTemp, Warning, TEXT("I've added dynamically function to unit %s"), *u->GetName());
 			});
 		}
 		
@@ -48,7 +48,7 @@ void ABaseSpawnIndicator::OnUnitCreated(ABaseUnit* Unit)
 	//we need to make visual representation
 	UMaterialInstanceDynamic* Mat = UMaterialInstanceDynamic::Create(IndicatorMaterial, this);
 	BaseIndicatorMesh->SetMaterial(0, Mat);
-	UE_LOG(LogTemp, Warning, TEXT("Unit Name is: %s"), *Unit->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("Unit Name is: %s"), *Unit->GetName());
 }
 
 // Called every frame
