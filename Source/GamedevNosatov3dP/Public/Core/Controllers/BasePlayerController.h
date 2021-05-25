@@ -43,7 +43,16 @@ public:
 
 	void RegisterHitAim();
 
+	UFUNCTION(Server, Reliable)
+	void SendChatMessage(const FText& Message);
+
+	UFUNCTION(Client, Reliable)
+	void ReceiveMessage(const FText& Message);
+
 private:
 	int32 HitCountInRow = 0;
+
+protected:
+	FString CurrentPlayerName;
 	
 };

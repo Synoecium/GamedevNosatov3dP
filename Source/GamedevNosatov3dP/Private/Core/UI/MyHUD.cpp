@@ -45,6 +45,10 @@ void AMyHUD::BeginPlay()
 	auto playerController = Cast<ABasePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
 	playerController->OnPlayerHitAim.AddUObject(this, &AMyHUD::UpdateComboCount);
 	playerController->OnPlayerMissAim.AddUObject(this, &AMyHUD::ResetCombo);
+
+	ChatWindow = CreateWidget<UChatWindow>(GetWorld(), ChatWindowClass ? ChatWindowClass : UChatWindow::StaticClass());
+	ChatWindow->AddToViewport();
+	ChatWindow->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AMyHUD::DrawHUD()
@@ -75,5 +79,13 @@ void AMyHUD::ResetCombo()
 	if (HitComboWidget)
 	{
 		HitComboWidget->ResetCombo();
+	}
+}
+
+void AMyHUD::AddMessageToChatWindow(const FText& Message)
+{
+	if (ChatWindow)
+	{
+		ChatWindow->AddMessage(Message);
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "ChatWindow.h"
 #include "HitComboWidget.h"
 #include "GameFramework/HUD.h"
 #include "MyHUD.generated.h"
@@ -46,8 +47,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Interactive")
 	TSubclassOf<UUserWidget> HitComboWidgetClass;
 
+	void AddMessageToChatWindow(const FText& Message);	
+	
 private:
 	UHitComboWidget* HitComboWidget;
-	
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	UChatWindow* ChatWindow;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UChatWindow> ChatWindowClass;
 	
 };

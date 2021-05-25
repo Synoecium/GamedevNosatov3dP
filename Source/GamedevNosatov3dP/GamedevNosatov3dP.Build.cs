@@ -12,6 +12,8 @@ public class GamedevNosatov3dP : ModuleRules
 		    "AIModule", "GameplayTasks", "ProceduralMeshComponent"});
 		
 		PrivateDependencyModuleNames.AddRange(new string[]{"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile", "DesktopPlatform"});
+		
+		//PrivateIncludePaths.AddRange(new string[] {"Plugins", "Plugins/MovieScene", "Plugins/SequencerScripting"});
 
 		if (Target.Type == TargetRules.TargetType.Editor)
 		{

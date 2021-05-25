@@ -5,6 +5,8 @@
 #include "Core/Actors/BaseBuilding.h"
 #include "Core/Actors/BaseUnit.h"
 #include "EngineUtils.h"
+#include "Core/UI/MyHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 void ABasePlayerController::BeginPlay()
 {
@@ -22,6 +24,8 @@ void ABasePlayerController::BeginPlay()
 	*/
 
 	OnPlayerMissAim.AddUObject(this, &ABasePlayerController::ClearHitCounts);
+
+	CurrentPlayerName = "Player" + FString::FromInt(FMath::RandHelper(10000));
 }
 
 void ABasePlayerController::SetupInputComponent()
@@ -51,6 +55,32 @@ void ABasePlayerController::RegisterHitAim()
 {
 	HitCountInRow++;
 	OnPlayerHitAim.Broadcast(HitCountInRow);
+}
+
+void ABasePlayerController::SendChatMessage_Implementation(const FText& Message)
+{
+	FText MessageWithName = FText::Format(NSLOCTEXT("MultyplayerChat", "Message", "{0}: {1}"),
+		FText::FromString(CurrentPlayerName), Message);
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABasePlayerController::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		ABasePlayerController* Controller = Cast<ABasePlayerController>(Actor);
+		Controller->ReceiveMessage(MessageWithName);
+	}
+
+	
+}
+
+void ABasePlayerController::ReceiveMessage_Implementation(const FText& Message)
+{
+	AMyHUD* HUD = Cast<AMyHUD>(GetHUD());
+	if (HUD)
+	{
+		HUD->AddMessageToChatWindow(Message);
+	}
 }
 
 /*
