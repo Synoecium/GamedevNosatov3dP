@@ -42,7 +42,7 @@ void UHitComboWidget::UpdateComboCount(int32 Value)
 
 void UHitComboWidget::ResetCombo()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Orange, __FUNCTION__);
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Orange, __FUNCTION__);
 
 	if (TXTCombo)
 	{

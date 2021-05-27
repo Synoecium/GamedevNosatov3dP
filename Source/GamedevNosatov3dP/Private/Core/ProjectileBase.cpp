@@ -3,6 +3,9 @@
 
 #include "Core/ProjectileBase.h"
 
+#include "DestructibleActor.h"
+#include "DestructibleComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Chaos/GeometryParticlesfwd.h"
 #include "Components/StaticMeshComponent.h"
 #include "Core/Controllers/BasePlayerController.h"
@@ -54,8 +57,29 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
+		ADestructibleActor* Des = Cast<ADestructibleActor>(OtherActor);
+		if (Des)
+		{
+			FVector ImpulseDir = Hit.Normal;
+			//ImpulseDir = Hit.ImpactNormal;
+			//ImpulseDir = FVector(0.5, 0, 0.5);
+			ImpulseDir = -ImpulseDir;
+			FVector Location = Des->GetActorLocation();
+			Location = Hit.Location;
+			//DrawDebugLine(GetWorld(), Location, Location+ImpulseDir*50,FColor::Red, false, 5);
+			DrawDebugDirectionalArrow(GetWorld(), Location, Location+ImpulseDir*100, 30, FColor::Red, false, 10);
+			Des->GetDestructibleComponent()->ApplyDamage(Damage, Location, ImpulseDir, ImpulseStrength);
+			UE_LOG(LogTemp, Warning, TEXT("Destructible actor damaged! Normal inputs %f %f %f Location %f %f %f")
+				, ImpulseDir.X, ImpulseDir.Y, ImpulseDir.Z, Location.X, Location.Y, Location.Z);
+
+		}
+		else
+		{
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
+		}
+		
 		//UE_LOG(LogTemp, Warning, TEXT("Projectile hit and destroyed"));
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
+		
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 		GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(HitShake);
@@ -64,7 +88,8 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("%s actor hit"), *OtherActor->GetName());
 			_bUsefulAimHit = true;
-		}		
+		}
+
 		
 		Destroy();
 	}

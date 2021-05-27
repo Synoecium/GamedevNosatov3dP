@@ -8,16 +8,21 @@ public class GamedevNosatov3dP : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "CustomBPDetailsBtn",
-		    "AIModule", "GameplayTasks", "ProceduralMeshComponent"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay"
+			//, "CustomBPDetailsBtn"
+			, "AIModule", "GameplayTasks", "ProceduralMeshComponent", "ApexDestruction" });
 		
-		PrivateDependencyModuleNames.AddRange(new string[]{"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile", "DesktopPlatform"});
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"Slate", "SlateCore", "UMG", "MediaAssets", "AppFramework", "PakFile", "DesktopPlatform"
+			
+		});
 		
 		//PrivateIncludePaths.AddRange(new string[] {"Plugins", "Plugins/MovieScene", "Plugins/SequencerScripting"});
 
 		if (Target.Type == TargetRules.TargetType.Editor)
 		{
-			PublicDependencyModuleNames.AddRange(new string[]{"UnrealEd"});
+			PublicDependencyModuleNames.AddRange(new string[]{"UnrealEd", "PropertyEditor"});
 		}
 	}
 }

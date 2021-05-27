@@ -22,6 +22,14 @@
 		{
 			"Name": "PythonScriptPlugin",
 			"Enabled": true
+		},
+		{
+			"Name": "ApexDestruction",
+			"Enabled": true
+		},
+		{
+			"Name": "CustomBPDetailsBtn",
+			"Enabled": false
 		}
 	]
 }
