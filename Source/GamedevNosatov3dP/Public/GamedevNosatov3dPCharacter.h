@@ -10,6 +10,8 @@
 #include "Core/Controllers/BasePlayerController.h"
 #include "Core/Interfaces/Saveable.h"
 #include "GameFramework/Character.h"
+#include "Perception/AISightTargetInterface.h"
+
 #include "GamedevNosatov3dPCharacter.generated.h"
 
 class AGun;
@@ -24,7 +26,7 @@ struct FS
 };
 
 UCLASS(config=Game)
-class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable
+class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable, public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
@@ -70,6 +72,8 @@ public:
 	bool IsAnimationBlended() {return true;};
 	bool IsArmed() {return true;};
 
+	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const override;
+
 protected:
 
 	void MoveForward(float AxisValue);
@@ -92,13 +96,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AGun> GunClass;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
     AGun* Gun;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(EditDefaultsOnly)
+	float MaxHealth = 100.f;
+
+	UFUNCTION(BlueprintPure)
+	float GetHealthPercent() const;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SpawnGun();
 
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -125,5 +142,8 @@ private:
 
 	UPROPERTY(SaveGame)
 	FS TestStruct;
+
+	float CurrentHealth = 100.f;
+	
 };
 

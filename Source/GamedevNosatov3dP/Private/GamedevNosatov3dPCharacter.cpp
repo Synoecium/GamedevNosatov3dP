@@ -15,6 +15,7 @@
 
 #include "Core/Gun.h"
 #include "Core/Actors/BaseUnit.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGamedevNosatov3dPCharacter
@@ -65,7 +66,8 @@ AGamedevNosatov3dPCharacter::AGamedevNosatov3dPCharacter()
 	//else GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Button class is empty!"));
 	
 	//ButtonComponent->SetRelativeLocationAndRotation(FVector(0,0,0),FRotator(0,180,0));
-	
+
+	SetReplicates(true);
 }
 
 void AGamedevNosatov3dPCharacter::BeginPlay()
@@ -79,6 +81,44 @@ void AGamedevNosatov3dPCharacter::BeginPlay()
 
 //////////////////////////////////////////////////////////////////////////
 // Input
+
+void AGamedevNosatov3dPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGamedevNosatov3dPCharacter, Gun);
+	
+	//DOREPLIFETIME_CONDITION(AGamedevNosatov3dPCharacter, Gun, COND_SkipOwner);
+}
+
+float AGamedevNosatov3dPCharacter::GetHealthPercent() const
+{
+	return CurrentHealth/MaxHealth;
+}
+
+void AGamedevNosatov3dPCharacter::SpawnGun_Implementation()
+{
+	if (!GunClass) return;
+	
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	if (Gun)
+	{
+		GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Gun->SetOwner(this);
+		//Gun->MaxRange = WeaponRange;
+
+		//Gun->SetOnlyOwnerSee(false);
+		//Gun->bCastDynamicShadows = false;
+		//Gun->CastShadow = false;
+		
+	}
+}
+
+bool AGamedevNosatov3dPCharacter::SpawnGun_Validate()
+{
+	return true;
+}
 
 void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -120,11 +160,7 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 	PlayerInputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Released, this, &AGamedevNosatov3dPCharacter::StopCrouch);
 	PlayerInputComponent->BindAction(TEXT("AnimationTest"), EInputEvent::IE_Pressed, this, &AGamedevNosatov3dPCharacter::AnimationTest);
 
-	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
-	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
-	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
-	Gun->SetOwner(this);
-	//Gun->MaxRange = WeaponRange;
+	SpawnGun();
 
 	/*if (ButtonClass)
 	{
@@ -133,6 +169,16 @@ void AGamedevNosatov3dPCharacter::SetupPlayerInputComponent(class UInputComponen
 		
 	}*/
 	//ButtonComponent->SetRelativeLocationAndRotation(FVector(0,0,0),FRotator(0,180,0));
+}
+
+float AGamedevNosatov3dPCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+	AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamageToApply = FMath::Min(CurrentHealth, DamageToApply);
+	CurrentHealth-=DamageToApply;
+	
+	return DamageToApply;
 }
 
 void AGamedevNosatov3dPCharacter::Saved()
@@ -172,7 +218,15 @@ void AGamedevNosatov3dPCharacter::Load(ABasePlayerController* Player)
 
 bool AGamedevNosatov3dPCharacter::IsDead() const
 {
-	return false;
+	return CurrentHealth<=0;
+}
+
+bool AGamedevNosatov3dPCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation,
+	int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
+{
+	OutSightStrength = 0.25;
+
+	return true;
 }
 
 void AGamedevNosatov3dPCharacter::MoveForward(float AxisValue)
@@ -261,19 +315,33 @@ void AGamedevNosatov3dPCharacter::AnimationTest()
 
 //PZ #6 start
 void AGamedevNosatov3dPCharacter::Shoot()
-{	
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("SHOOT"));
 	if (Gun == nullptr) return;
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Gun is not NULL"));
+	//UE_LOG(LogTemp, Warning, TEXT("Gun is not NULL"));
 	UWorld* CurrentWorld = GetWorld();
 	if (CurrentWorld==nullptr) return;
+	UE_LOG(LogTemp, Warning, TEXT("World is not NULL"));
 	ABaseGameModeBase* CurrentGameMode = Cast<ABaseGameModeBase>(UGameplayStatics::GetGameMode(CurrentWorld));
-	if (CurrentGameMode==nullptr) return;
+
+	int32 CurrentAmmoCount = 50;
+	if (CurrentGameMode==nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameMode is not NULL"));	
+		//return;
+	}
+	else
+	{
+		CurrentAmmoCount = CurrentGameMode->GetAmmoCount();
+	}	
 	
-	int32 CurrentAmmoCount = CurrentGameMode->GetAmmoCount();
 	if (CurrentAmmoCount>0)
 	{
-		Gun->PullTrigger();
+		//Gun->PullTrigger();
+		Gun->OnFire();
 		CurrentAmmoCount--;
-		CurrentGameMode->SetAmmoCount(CurrentAmmoCount);
+		if (CurrentGameMode) CurrentGameMode->SetAmmoCount(CurrentAmmoCount);
 	}
 }
 
@@ -301,3 +369,4 @@ float AGamedevNosatov3dPCharacter::PlayAnimMontage(UAnimMontage* AnimMontage, fl
 }
 
 //PZ #6 finish
+

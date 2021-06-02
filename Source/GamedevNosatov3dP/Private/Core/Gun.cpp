@@ -24,9 +24,16 @@ AGun::AGun()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(Mesh);
 
+	SetReplicates(true);
+
 }
 
 void AGun::PullTrigger()
+{
+	OnFire();
+}
+
+void AGun::OnFire_Implementation()
 {
 	/*
 	//UE_LOG(LogTemp, Warning, TEXT("You've been shot!"));
@@ -53,12 +60,18 @@ void AGun::PullTrigger()
 	{
 		FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
-		AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParameters);
 		TempProjectile->SetOwner(this);
 		
 	}
 	
-	
+}
+
+bool AGun::OnFire_Validate()
+{
+	return true;
 }
 
 // Called when the game starts or when spawned

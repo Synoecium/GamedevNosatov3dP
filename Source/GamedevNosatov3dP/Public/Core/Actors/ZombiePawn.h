@@ -21,6 +21,8 @@ enum class EZombieState : uint8
 	ZS_Dead
 };
 
+class AGun;
+
 UCLASS()
 class GAMEDEVNOSATOV3DP_API AZombiePawn : public ACharacter
 {
@@ -35,6 +37,18 @@ protected:
 
 	UPROPERTY()
 	UAISenseConfig_Sight* _sightConfig;
+
+	UPROPERTY(EditDefaultsOnly, Category=Gun)
+	TSubclassOf<AGun> GunClass;
+	
+	UPROPERTY()
+	AGun* Gun;
+
+	UPROPERTY(EditDefaultsOnly, Category=Gun)
+	float FireRate = 1.f;
+
+	UPROPERTY(VisibleDefaultsOnly, Category=Gun)
+	USkeletalMeshComponent* _gun = nullptr;
 	
 public:
 	// Sets default values for this pawn's properties
@@ -46,14 +60,33 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeState(EZombieState NewState);
 
+	UFUNCTION(BlueprintCallable)
+	void Shoot();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnShootMade();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void PerceptionUpdated(const TArray<AActor*>& Actors);
+	UFUNCTION()
+	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	virtual void PostInitializeComponents() override;
+
+	FTimerHandle _fireTimerHandle;
+	bool _isReadyToFire = true;
+
+	UFUNCTION()
+	void SetReadyToShoot();
+
+	void OnShootMade_Implementation();
+
+
 
 public:	
 	// Called every frame
