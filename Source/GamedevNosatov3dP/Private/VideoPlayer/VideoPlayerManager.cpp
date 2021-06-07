@@ -55,6 +55,7 @@ void UVideoPlayerManager::PlayTestVideo()
 			{
 				auto MScomp = Cast<UMediaSoundComponent>(_CurrentVideoPlayerActor->GetComponentByClass(UMediaSoundComponent::StaticClass()));
 				if (MScomp)
+				{
 					if (_CurrentPlaylist)
 					{
 						MScomp->GetMediaPlayer()->OpenPlaylist(_CurrentPlaylist);
@@ -62,7 +63,8 @@ void UVideoPlayerManager::PlayTestVideo()
 					else
 					{
 						MScomp->GetMediaPlayer()->OpenSource(_CurrentMediaSource);
-					}			
+					}								
+				}
 			}
 		}
 	}

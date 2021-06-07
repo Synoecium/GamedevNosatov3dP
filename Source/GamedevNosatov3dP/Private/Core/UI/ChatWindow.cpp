@@ -22,7 +22,7 @@ void UChatWindow::NativeConstruct()
 
 void UChatWindow::AddMessage(FText Message)
 {
-	TSubclassOf<UChatMessage> WidgetClass = MessageWidgetClass ? MessageWidgetClass : UChatMessage::StaticClass();
+	TSubclassOf<UChatMessage> WidgetClass = MessageWidgetClass ? MessageWidgetClass : TSubclassOf<UChatMessage>(UChatMessage::StaticClass());
 	UChatMessage* NewMessageWidget = CreateWidget<UChatMessage>(GetWorld(), WidgetClass);
 	NewMessageWidget->SetMessageText(Message);
 	if (ChatScrollBox)

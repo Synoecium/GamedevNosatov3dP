@@ -46,7 +46,7 @@ void AMyHUD::BeginPlay()
 	playerController->OnPlayerHitAim.AddUObject(this, &AMyHUD::UpdateComboCount);
 	playerController->OnPlayerMissAim.AddUObject(this, &AMyHUD::ResetCombo);
 
-	ChatWindow = CreateWidget<UChatWindow>(GetWorld(), ChatWindowClass ? ChatWindowClass : UChatWindow::StaticClass());
+	ChatWindow = CreateWidget<UChatWindow>(GetWorld(), ChatWindowClass ? ChatWindowClass : TSubclassOf<UChatWindow>(UChatWindow::StaticClass()));
 	ChatWindow->AddToViewport();
 	ChatWindow->SetVisibility(ESlateVisibility::Hidden);
 }
