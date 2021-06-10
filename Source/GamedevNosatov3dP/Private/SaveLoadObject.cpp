@@ -125,7 +125,7 @@ void USaveLoadObject::LoadCharacter(APlayerController* CharacterToLoad)
 		if (ISaveable* SaveableObject = Cast<ISaveable>(Pawn))
 		{
 			SaveableObject->PreLoaded();
-			Pawn->SetActorLocation(LoadedData.Pawn.Position);
+			//Pawn->SetActorLocation(LoadedData.Pawn.Position);
 			Pawn->SetActorRotation(LoadedData.Pawn.Rotation);
 			FMemoryReader PawnMemoryReader(LoadedData.Pawn.Data);
 			FObjectAndNameAsStringProxyArchive Ar(PawnMemoryReader, true);
