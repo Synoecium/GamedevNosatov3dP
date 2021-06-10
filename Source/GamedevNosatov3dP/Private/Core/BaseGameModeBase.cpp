@@ -18,6 +18,7 @@
 #include "Engine/World.h"
 #include "Engine/LocalPlayer.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Core/Network/TCPClient.h"
 
 #if WITH_EDITOR
 #include "Editor/EditorEngine.h"
@@ -38,6 +39,17 @@ ABaseGameModeBase::ABaseGameModeBase()
 	DialogMessage = "Hello, I love dancing!";
 	Base_ConfRef = nullptr;
 	Score = 0.f;
+}
+
+ABaseGameModeBase::~ABaseGameModeBase()
+{
+	if (client != nullptr)
+	{
+		WriteInt(9);
+		client->Write(Buff.GetData(), Buff.Num());
+		Buff.Empty();
+		delete client;
+	}
 }
 
 bool ABaseGameModeBase::SpawnUnit(AActor*& parActor) 
@@ -231,6 +243,118 @@ void ABaseGameModeBase::SetImageFileAsTexture(AActor* TargetActor, const FString
 		meshComp->SetMaterial(0, MID);
 		
 	}
+}
+
+void ABaseGameModeBase::SavePlayerResult(FString PlayerName, int32 Scores)
+{
+	if (!client) client = new TCPClient();
+	if (client)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Before connect"));
+		constexpr int32 SaveRequestID = 1;
+		if (!client->IsConnected())
+		{
+			FIPv4Address Address;
+			FIPv4Address::Parse("127.0.0.1", Address);
+			client->Connect(Address, 65432);		
+		}
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Connected"));
+		if (PlayerName.Len() == 5) // && Scores > 0)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Data is OK"));
+			WriteInt(SaveRequestID);
+			WriteString(PlayerName);
+			WriteInt(Scores);
+			client->Write(Buff.GetData(), Buff.Num());
+			Buff.Empty();
+			//UE_LOG(LogTemp, Warning, TEXT("Data saved"));
+		}
+		
+	}
+}
+
+TArray<FUserDataGD> ABaseGameModeBase::GetUserData()
+{
+	TArray<FUserDataGD> Data;
+	if (!client) client = new TCPClient();
+
+	if (client)
+	{
+		constexpr int32 SaveRequestID = 2;
+		if (!client->IsConnected())
+		{
+			FIPv4Address Address;
+			FIPv4Address::Parse("127.0.0.1", Address);
+			client->Connect(Address, 65432);
+		}
+
+		WriteInt(SaveRequestID);
+
+		client->Write(Buff.GetData(), Buff.Num());
+		Buff.Empty();
+
+		auto Result = client->Read(4);
+		int32 Entries = ReadInt(Result);
+		for (int32 i = 0; i < Entries; i++)
+		{
+			FUserDataGD UserData;
+			auto ScoresEntry = client->Read(4);
+			UserData.Scores = ReadInt(ScoresEntry);
+			auto NameEntry = client->Read(5);
+			UserData.Name = ReadString(NameEntry);
+
+			Data.Add(UserData);
+		}		
+	}
+	return Data;
+}
+
+int32 ABaseGameModeBase::ReadInt(TArray<uint8> Data)
+{
+	int32 result = 0;
+	if (Data.Num() == 0) return result;
+	unsigned char* bits = (unsigned char*)Data.GetData();
+	/*read little endian*/
+	for (int32 n = 3; n >= 0; n--)
+	{
+		result = (result << 8) + bits[n];
+	}
+	return result;
+}
+
+FString ABaseGameModeBase::ReadString(TArray<uint8> Data)
+{
+	Data.Add(0);
+	FString Result = FString(UTF8_TO_TCHAR(Data.GetData()));
+	return Result;
+}
+
+bool ABaseGameModeBase::WriteInt(int32 Value)
+{
+	unsigned char* CValue = (unsigned char*)(&Value);
+	for (int32 i = 0; i < sizeof(Value); i++)
+	{
+		Buff.Push(CValue[i]);
+	}
+	return true;
+}
+
+bool ABaseGameModeBase::WriteString(FString Value)
+{
+	FString Test(Value);
+	auto UTF8Value = TCHAR_TO_UTF8(*Value);
+	return WriteBytes((unsigned char*)UTF8Value, strlen(UTF8Value));
+}
+
+bool ABaseGameModeBase::WriteBytes(unsigned char* Data, int32 Size)
+{
+	if (Data == nullptr || Size <= 0) return false;
+	for (int32 i = 0; i < Size; i++)
+	{
+		Buff.Push(Data[i]);
+	}
+	return true;
 }
 
 void ABaseGameModeBase::SaveAmmoToFile(FString FileName)

@@ -10,7 +10,7 @@ public class GamedevNosatov3dP : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay"
 			//, "CustomBPDetailsBtn"
-			, "AIModule", "GameplayTasks", "ProceduralMeshComponent", "ApexDestruction" });
+			, "AIModule", "GameplayTasks", "ProceduralMeshComponent", "ApexDestruction", "Sockets", "Networking" });
 		
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{

@@ -13,7 +13,22 @@
 #include "BaseGameModeBase.generated.h"
 
 class UBaseCoreConfig;
+class TCPClient;
 
+USTRUCT(BlueprintType)
+struct FUserDataGD
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FString Name;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 Scores;
+
+};
+
+	
 UCLASS(minimalapi)
 class ABaseGameModeBase : public AGameModeBase
 {
@@ -21,6 +36,7 @@ class ABaseGameModeBase : public AGameModeBase
 
 public:
 	ABaseGameModeBase();
+	~ABaseGameModeBase();
 
 	UPROPERTY(EditAnyWhere, Category = "Bank | Money | USD")
 	int32 AmountOfMoney;
@@ -93,6 +109,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetImageFileAsTexture(AActor* TargetActor, const FString& Filename);
 
+	UFUNCTION(BlueprintCallable)
+	void SavePlayerResult(FString PlayerName, int32 Scores);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FUserDataGD> GetUserData();
+
 protected:
 	//PZ #5 start
 	float Score;
@@ -105,6 +127,15 @@ protected:
 
 	UPROPERTY(EditAnyWhere)
 	UInputComponent* SavedInputComponent;
+
+	TCPClient* client = nullptr;
+	TArray<unsigned char> Buff;
+	bool WriteInt(int32 Value);
+	bool WriteString(FString Value);
+	bool WriteBytes(unsigned char* Data, int32 Size);
+	int32 ReadInt(TArray<uint8> Data);
+	FString ReadString(TArray<uint8> Data);
+	
 };
 
 

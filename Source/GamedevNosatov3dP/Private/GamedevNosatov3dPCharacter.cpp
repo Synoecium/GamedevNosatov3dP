@@ -316,9 +316,9 @@ void AGamedevNosatov3dPCharacter::AnimationTest()
 //PZ #6 start
 void AGamedevNosatov3dPCharacter::Shoot()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("SHOOT"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("SHOOT"));
 	if (Gun == nullptr) return;
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Gun is not NULL"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Gun is not NULL"));
 	//UE_LOG(LogTemp, Warning, TEXT("Gun is not NULL"));
 	UWorld* CurrentWorld = GetWorld();
 	if (CurrentWorld==nullptr) return;
