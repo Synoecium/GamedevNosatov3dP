@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Core/BaseGameModeBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -76,6 +77,20 @@ void AGamedevNosatov3dPCharacter::BeginPlay()
 
 	//ButtonComponent->SetRelativeLocation(FVector(0,0,0));
 	//ButtonComponent->SetWorldLocation(FVector(0,0,0));
+
+	if (KnockbackCurve)
+	{
+		FOnTimelineFloat TimelineCallback;
+		FOnTimelineEventStatic TimelineFinishedCallback;
+
+		TimelineCallback.BindUFunction(this, FName("ControlKnockback"));
+		TimelineFinishedCallback.BindUFunction(this, FName("FinishKnockback"));
+
+		KnockbackTimeline = NewObject<UTimelineComponent>(this, FName("KnockbackAnimation"));
+		KnockbackTimeline->AddInterpFloat(KnockbackCurve, TimelineCallback);
+		KnockbackTimeline->SetTimelineFinishedFunc(TimelineFinishedCallback);
+		KnockbackTimeline->RegisterComponent();
+	}
 	
 }
 
@@ -94,6 +109,52 @@ void AGamedevNosatov3dPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimePro
 float AGamedevNosatov3dPCharacter::GetHealthPercent() const
 {
 	return CurrentHealth/MaxHealth;
+}
+
+void AGamedevNosatov3dPCharacter::PlayKnockback()
+{
+	if (KnockbackTimeline == nullptr) return;
+	if (KnockbcakState == EKnockbackState::READY)
+	{
+		KnockbackTimeline->SetPlayRate(1.f);
+		KnockbackTimeline->PlayFromStart();
+		KnockbcakState = EKnockbackState::KNOCKBACK;
+	}
+	else if (KnockbcakState == EKnockbackState::KNOCKBACK)
+	{
+		//do nothing	
+	}
+	else	//KnockbcakState == EKnockbackState::REVERSE
+	{
+		KnockbackTimeline->SetPlayRate(1.f);
+		KnockbackTimeline->Play();
+		KnockbcakState = EKnockbackState::KNOCKBACK;
+	}
+}
+
+void AGamedevNosatov3dPCharacter::ControlKnockback()
+{
+	float KnockbcakTimelinePos = KnockbackTimeline->GetPlaybackPosition();
+	KnockbackAngleValue = MaxKnockbackAngle * KnockbackCurve->GetFloatValue(KnockbcakTimelinePos);
+}
+
+void AGamedevNosatov3dPCharacter::FinishKnockback()
+{
+	
+	//KnockbcakTimelinePos = 0.f;
+	if (KnockbcakState == EKnockbackState::KNOCKBACK)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Finish KNOCKBACK"));
+		KnockbackTimeline->SetPlayRate(0.25f);
+		KnockbackTimeline->ReverseFromEnd();
+		KnockbcakState = EKnockbackState::REVERSE;
+	}
+	else if (KnockbcakState == EKnockbackState::REVERSE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Finish REVERSE"));
+		KnockbcakState = EKnockbackState::READY;
+	}
+	
 }
 
 void AGamedevNosatov3dPCharacter::SpawnGun_Implementation()
@@ -179,6 +240,16 @@ float AGamedevNosatov3dPCharacter::TakeDamage(float DamageAmount, FDamageEvent c
 	CurrentHealth-=DamageToApply;
 	
 	return DamageToApply;
+}
+
+void AGamedevNosatov3dPCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (KnockbackTimeline != nullptr)
+	{
+		KnockbackTimeline->TickComponent(DeltaSeconds, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+	}
 }
 
 void AGamedevNosatov3dPCharacter::Saved()

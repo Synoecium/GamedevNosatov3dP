@@ -44,6 +44,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	float AimPitch;
+
+	UPROPERTY(BlueprintReadWrite)
+	float KnockbackAngle;
 	
 	virtual void NativeInitializeAnimation() override;
 

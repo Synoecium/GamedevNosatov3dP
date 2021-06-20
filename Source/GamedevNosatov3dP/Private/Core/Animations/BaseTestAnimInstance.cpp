@@ -40,6 +40,8 @@ void UBaseTestAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsCrouching = PlayerCharacter->GetMovementComponent()->IsCrouching();
 		bIsArmed = PlayerCharacter->IsArmed();
 		bIsMoving = Speed > 0 ? true : false;
+
+		KnockbackAngle = PlayerCharacter->KnockbackAngleValue;
 	}
 	
 }

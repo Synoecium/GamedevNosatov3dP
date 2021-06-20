@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root xmlns:android="http://schemas.android.com/apk/res/android" package="com.yourproject.test">
+    <init>
+        <log text = "UPL file working"/>
+    </init>
+    
+    <androidManifestUpdates>
+        <addPermission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+        <addPermission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        <addPermission android:name="android.permission.CAMERA"/>
+        <addPermission android:name="android.permission.READ_PHONE_STATE"/>
+    </androidManifestUpdates>
+    
+    <buildGradleAdditions>
+        <insert>
+            dependencies
+            {
+                compile('com.google.android.gms:play-services-vision:+')
+                compile('com.android.support:appcompat-v7:24.2.1')
+            }
+        </insert>
+    </buildGradleAdditions>
+    
+    <gameActivityClassAdditions>
+        <insert>
+            private int TestInt = 1;
+            private String TestVariable;
+            public void TestFunction()
+            {
+                Log.debug("TestFunction: is called from java");
+            }
+
+            public void TakePhoto()
+            {
+                Log.debug("JavaTakePhoto: is called from java");
+                AndroidThunkJava_OpenCamera();
+            }
+
+            //Call the camera
+            public boolean AndroidThunkJava_OpenCamera()
+            {
+                Intent intent = new Intent();
+                intent.setAction("android.media.action.STILL_IMAGE_CAMERA");
+                startActivity(intent);
+                return true;
+            }
+            
+        </insert>
+    </gameActivityClassAdditions>
+    
+    <gameActivityOnActivityResultAdditions>
+        <insert>
+            Log.debug("Log called from OnActivityResult");
+        </insert>
+    </gameActivityOnActivityResultAdditions>
+    
+    <gameActivityImportAdditions>
+        <insert>
+            import android.content.Intent;
+            import android.os.Environment;
+            import android.provider.MediaStore;
+        </insert>
+    </gameActivityImportAdditions>
+
+    <gradleProperties>
+        <insert>
+            android.useAndroidX=true
+            android.enableJetifier=true
+        </insert>
+    </gradleProperties>
+
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+            implementation 'com.google.android.gms:play-services-games:21.0.0'
+            }
+
+            apply plugin: 'com.android.application'
+
+            allprojects {
+            def mappings = [
+            'android.support.annotation': 'androidx.annotation',
+            'android.arch.lifecycle': 'androidx.lifecycle',
+            'android.support.v4.app.NotificationCompat': 'androidx.core.app.NotificationCompat',
+            'android.support.v4.app.NotificationManagerCompat': 'androidx.core.app.NotificationManagerCompat',
+            'android.support.v4.app.ActivityCompat': 'androidx.core.app.ActivityCompat',
+            'android.support.v4.content.ContextCompat': 'androidx.core.content.ContextCompat',
+            'android.support.v4.content.FileProvider': 'androidx.core.content.FileProvider',
+            'android.support.v13.app.FragmentCompat': 'androidx.legacy.app.FragmentCompat',
+            'android.arch.lifecycle.Lifecycle': 'androidx.lifecycle.Lifecycle',
+            'android.arch.lifecycle.LifecycleObserver': 'androidx.lifecycle.LifecycleObserver',
+            'android.arch.lifecycle.OnLifecycleEvent': 'androidx.lifecycle.OnLifecycleEvent',
+            'android.arch.lifecycle.ProcessLifecycleOwner': 'androidx.lifecycle.ProcessLifecycleOwner',
+            ]
+
+
+            afterEvaluate { project ->
+            project.rootProject.projectDir.traverse(type: groovy.io.FileType.FILES, nameFilter: ~/.*\.java$/) { f ->
+            mappings.each { entry ->
+            if (f.getText('UTF-8').contains(entry.key)) {
+            println "Updating ${entry.key} to ${entry.value} in file ${f}"
+            ant.replace(file: f, token: entry.key, value: entry.value)
+            }
+            }
+            }
+            }
+            }
+        </insert>
+    </buildGradleAdditions>
+    
+</root>

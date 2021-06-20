@@ -15,6 +15,7 @@
 #include "GamedevNosatov3dPCharacter.generated.h"
 
 class AGun;
+class UTimelineComponent;
 
 USTRUCT()
 struct FS
@@ -25,11 +26,21 @@ struct FS
 	int32 TestVar;	
 };
 
+UENUM()
+enum class EKnockbackState : uint8
+{
+	READY,
+	KNOCKBACK,
+	REVERSE
+};
+
 UCLASS(config=Game)
 class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable, public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
+public:
+	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -43,11 +54,6 @@ class AGamedevNosatov3dPCharacter : public ACharacter, public ISaveable, public 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> ButtonClass;
 
-public:
-	AGamedevNosatov3dPCharacter();
-
-	virtual void BeginPlay() override;
-
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -56,25 +62,69 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(EditDefaultsOnly, Category="Test")
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
 	FName TestMontageSectionName;
 
-	UPROPERTY(EditDefaultsOnly, Category="Test")
+	UPROPERTY(EditDefaultsOnly, Category="Montage")
 	UAnimMontage* TestMontageRef;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// float WeaponRange = 5000.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Gun")
+	TSubclassOf<AGun> GunClass;
+
+	UPROPERTY(EditAnywhere, Category="Common")
+	float RotationRate = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Common")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Gun")
+	float MaxKnockbackAngle = 40;
+
+	UPROPERTY(EditAnywhere, Category="Gun")
+	UCurveFloat* KnockbackCurve;
+
+	UPROPERTY(BlueprintReadOnly)
+	float KnockbackAngleValue = 0;
+
+
+public:
 	
+	UFUNCTION(BlueprintCallable)
+	void Save(ABasePlayerController* Player);
+
+	UFUNCTION(BlueprintCallable)
+	void Load(ABasePlayerController* Player);
+
 	UFUNCTION(BlueprintPure)
-    bool IsDead() const;
+	float GetHealthPercent() const;
 
-	void Shoot();
+	UFUNCTION(BlueprintPure)
+	bool IsDead() const;
 
+	UFUNCTION(BlueprintCallable)
+	void PlayKnockback();
+
+public:
+	AGamedevNosatov3dPCharacter();
+
+	virtual void BeginPlay() override;
 	float PlayAnimMontage(UAnimMontage* AnimMontage, float InPlayRate, FName StartSectionName) override;
-	
-	bool IsAnimationBlended() {return true;};
-	bool IsArmed() {return true;};
-
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// End of APawn interface
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
+
+	void Shoot();
+	
+
 
 	void MoveForward(float AxisValue);
     void MoveRight(float AxisValue);
@@ -87,35 +137,16 @@ protected:
 	virtual bool CanCrouch() const override;
 	void AnimationTest();
 
-	UPROPERTY(EditAnywhere)
-	float RotationRate = 10.f;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	// float WeaponRange = 5000.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AGun> GunClass;
-	
-	UPROPERTY(Replicated)
-    AGun* Gun;
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	UPROPERTY(EditDefaultsOnly)
-	float MaxHealth = 100.f;
-
-	UFUNCTION(BlueprintPure)
-	float GetHealthPercent() const;
-
+protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SpawnGun();
 
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
+	UFUNCTION()
+	void ControlKnockback();
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION()
+	void FinishKnockback();	
+
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -123,20 +154,19 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-public:
-
 	virtual void Saved() override;
 	virtual void Loaded() override;
 	virtual void PreSaved() override {};
 	virtual void PreLoaded() override {};
 
-	UFUNCTION(BlueprintCallable)
-	void Save(ABasePlayerController* Player);
-
-	UFUNCTION(BlueprintCallable)
-	void Load(ABasePlayerController* Player);
+	bool IsAnimationBlended() {return true;};
+	bool IsArmed() {return true;};
 
 private:
+
+	UPROPERTY(Replicated)
+	AGun* Gun;
+	
 	UPROPERTY(SaveGame)
 	int32 TestVar = 0;
 
@@ -144,6 +174,11 @@ private:
 	FS TestStruct;
 
 	float CurrentHealth = 100.f;
-	
+
+	UTimelineComponent* KnockbackTimeline = nullptr;
+	//float KnockbcakTimelinePos = 0;
+	EKnockbackState KnockbcakState = EKnockbackState::READY;
 };
+
+
 
