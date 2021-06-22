@@ -9,6 +9,7 @@
 #include "Components/InputComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Core/BaseGameModeBase.h"
+#include "Core/FallShake.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -68,6 +69,9 @@ AGamedevNosatov3dPCharacter::AGamedevNosatov3dPCharacter()
 	
 	//ButtonComponent->SetRelativeLocationAndRotation(FVector(0,0,0),FRotator(0,180,0));
 
+	SampleDistortionClass = TSubclassOf<UMatineeSampleDistortion>(UMatineeSampleDistortion::StaticClass());
+	FallShakeClass = TSubclassOf<UFallShake>(UFallShake::StaticClass());
+	
 	SetReplicates(true);
 }
 
@@ -252,6 +256,25 @@ void AGamedevNosatov3dPCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void AGamedevNosatov3dPCharacter::Landed(const FHitResult& Hit)
+{
+	UWorld* CurrentWorld = GetWorld();
+	if (CurrentWorld==nullptr) return;
+	
+	FVector CurrentVelocity = GetVelocity();
+	float VerticalSpeed = FMath::Abs(CurrentVelocity.Z);
+	UE_LOG(LogTemp, Warning, TEXT("CHARACTER Landed, Velocity = %s"),*GetVelocity().ToString());
+	if (VerticalSpeed > HeightShakeTrigger)
+	{		
+		auto PlayerController = CurrentWorld->GetFirstPlayerController();
+		if (PlayerController != nullptr)
+		{
+			PlayerController->PlayerCameraManager->PlayCameraShake(FallShakeClass,VerticalSpeed/HeightShakeTrigger);
+		}
+	}
+
+}
+
 void AGamedevNosatov3dPCharacter::Saved()
 {
 	UE_LOG(LogTemp, Warning, TEXT("CHARACTER SAVED"));
@@ -393,13 +416,13 @@ void AGamedevNosatov3dPCharacter::Shoot()
 	//UE_LOG(LogTemp, Warning, TEXT("Gun is not NULL"));
 	UWorld* CurrentWorld = GetWorld();
 	if (CurrentWorld==nullptr) return;
-	UE_LOG(LogTemp, Warning, TEXT("World is not NULL"));
+	//UE_LOG(LogTemp, Warning, TEXT("World is not NULL"));
 	ABaseGameModeBase* CurrentGameMode = Cast<ABaseGameModeBase>(UGameplayStatics::GetGameMode(CurrentWorld));
 
 	int32 CurrentAmmoCount = 50;
 	if (CurrentGameMode==nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode is not NULL"));	
+		UE_LOG(LogTemp, Warning, TEXT("GameMode is NULL"));	
 		//return;
 	}
 	else
@@ -413,6 +436,12 @@ void AGamedevNosatov3dPCharacter::Shoot()
 		Gun->OnFire();
 		CurrentAmmoCount--;
 		if (CurrentGameMode) CurrentGameMode->SetAmmoCount(CurrentAmmoCount);
+
+		auto PlayerController = CurrentWorld->GetFirstPlayerController();
+		if (PlayerController != nullptr)
+		{
+			PlayerController->PlayerCameraManager->PlayCameraShake(SampleDistortionClass,1.f);
+		}
 	}
 }
 

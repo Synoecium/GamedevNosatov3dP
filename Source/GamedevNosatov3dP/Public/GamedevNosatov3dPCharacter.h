@@ -7,6 +7,7 @@
 
 
 #include "Components/WidgetComponent.h"
+#include "Core/MatineeSampleDistortion.h"
 #include "Core/Controllers/BasePlayerController.h"
 #include "Core/Interfaces/Saveable.h"
 #include "GameFramework/Character.h"
@@ -16,6 +17,8 @@
 
 class AGun;
 class UTimelineComponent;
+class UMatineeSampleDistortion;
+class UFallShake;
 
 USTRUCT()
 struct FS
@@ -86,9 +89,17 @@ public:
 	UPROPERTY(EditAnywhere, Category="Gun")
 	UCurveFloat* KnockbackCurve;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="Gun")
 	float KnockbackAngleValue = 0;
 
+	UPROPERTY(EditDefaultsOnly, Category="Camera")
+	TSubclassOf<UMatineeSampleDistortion> SampleDistortionClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Camera")
+	TSubclassOf<UFallShake> FallShakeClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Camera")
+	float HeightShakeTrigger;
 
 public:
 	
@@ -119,6 +130,7 @@ public:
 	// End of APawn interface
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void Landed(const FHitResult& Hit) override;
 
 protected:
 
